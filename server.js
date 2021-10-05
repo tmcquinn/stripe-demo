@@ -1,4 +1,4 @@
-const stripe = require('stripe')('sk_test_51Jgqo6C24NcqpTPOlrLJ0sw7QbavTuwyhZeDB1FeKLrkw46QNdVxgyY5EROkuRol1QKIw8Km5W54W6RSTCx37OPh00tnxt7viy');
+const stripe = require('stripe')('sk_test_51JhCG9C2zMcMmFPH36FR6I7CxeZ9BkhP8ViV1S7dbQqEIHTXt2ryPgsoWQx5fYkdiiAFjObBCmW2vLEyUX83w8aq007MzgAlv5');
 const express = require('express');
 const app = express();
 app.use(express.static('public'));
@@ -13,7 +13,7 @@ app.post('/create-checkout-session', async (req, res) => {
     mode: 'payment',
     line_items: [
       {
-        price: 'price_1JgqonC24NcqpTPOIeARtsST',
+        price: 'price_1JhCIuC2zMcMmFPHr8ootNDE',
         quantity: 1,
       },
     ],
@@ -124,7 +124,7 @@ app.post('/orderBags', async (req, res) => {
     console.log("sent invoice");
     const invoiceItem = await stripe.invoiceItems.create({
       customer: currentCustomer,
-      price: 'price_1Jgw7HC24NcqpTPOKQ9ikPn9',
+      price: 'price_1JhCJvC2zMcMmFPHHWdqZv9P',
     });
     const invoice = await stripe.invoices.create({
       customer: currentCustomer,
@@ -140,7 +140,7 @@ app.post('/orderBags', async (req, res) => {
     console.log("sent invoice");
     const invoiceItem = await stripe.invoiceItems.create({
       customer: currentCustomer,
-      price: 'price_1Jgw7HC24NcqpTPOKQ9ikPn9',
+      price: 'price_1JhCJvC2zMcMmFPHHWdqZv9P',
     });
     const invoice = await stripe.invoices.create({
       customer: currentCustomer,
