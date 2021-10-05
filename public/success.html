@@ -1,0 +1,30 @@
+<html>
+<head>
+  <title>Thanks for your order!</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <section>
+    <p>
+      We appreciate your business!
+    </p>
+    <a href="checkout.html"><button type="submit" id="checkout-button">Go Home</button></a>
+  </section>
+
+
+  <section>
+    <div class="product">
+      <img
+        src="garbage-bag.png"
+        alt=""
+      />
+      <div class="description">
+        <h3>setup automatic payments for smart bags</h3>
+      </div>
+    </div>
+    <form action="/create-setup-session" method="POST">
+      <button type="submit" id="checkout-button">Setup Automatic Payments</button>
+    </form>
+  </section>
+</body>
+</html>

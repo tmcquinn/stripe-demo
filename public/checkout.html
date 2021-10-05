@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Buy cool new product</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://polyfill.io/v3/polyfill.min.js?version=3.52.1&features=fetch"></script>
+    <script src="https://js.stripe.com/v3/"></script>
+  </head>
+  <body>
+    <section>
+      <div class="product">
+        <img
+          src="trash-bin.png"
+          alt=""
+        />
+        <div class="description">
+          <h3>Smart Trash Bin</h3>
+          <h5>$100.00</h5>
+        </div>
+      </div>
+      <form action="/create-checkout-session" method="POST">
+        <button type="submit" id="checkout-button">Checkout</button>
+      </form>
+    </section>
+
+    <section class="simulate">
+      <div class="product">
+        <img
+          src="garbage-bag.png"
+          alt=""
+        />
+        <div class="description">
+          <h3>Smart Bag</h3>
+          <h5>$12.00</h5>
+        </div>
+      </div> 
+
+      <form action="/orderBags" method="POST">
+        <button type="submit" id="checkout-button">Simulate Bag Order</button2>
+      </form>
+    </section>
+  </body>
+</html>
