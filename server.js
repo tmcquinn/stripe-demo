@@ -1,9 +1,9 @@
-const stripe = require('stripe')('sk_test_51JhCG9C2zMcMmFPH36FR6I7CxeZ9BkhP8ViV1S7dbQqEIHTXt2ryPgsoWQx5fYkdiiAFjObBCmW2vLEyUX83w8aq007MzgAlv5');
+const stripe = require('stripe')('sk_test_51JiLM8JjeRN6yJjjUh7aRGYVTYnTT0AArDQxjyD5nj2IhslRfuuvc7ipiYcSgNNTMWW3hXWQT3fcmDC8U9BFYUaJ00lt3U2ICO');
 const express = require('express');
 const app = express();
 app.use(express.static('public'));
 
-var currentCustomer = null;
+var currentCustomer = 'cus_KN5YupwEwdiRjx';
 
 const YOUR_DOMAIN = 'http://localhost:4242';
 
@@ -13,7 +13,7 @@ app.post('/create-checkout-session', async (req, res) => {
     mode: 'payment',
     line_items: [
       {
-        price: 'price_1JhCIuC2zMcMmFPHr8ootNDE',
+        price: 'price_1JiLMnJjeRN6yJjjFAz6CBEx',
         quantity: 1,
       },
     ],
@@ -44,7 +44,7 @@ app.post('/create-setup-session', async (req, res) => {
 
 })
 
-app.post('/webhook', express.json({type: 'application/json'}), (request, response) => {
+app.post('/webhook', express.json({type: 'application/json'}), async (request, response) => {
   const event = request.body;
 
   // Handle the event
@@ -53,6 +53,7 @@ app.post('/webhook', express.json({type: 'application/json'}), (request, respons
       const paymentIntent = event.data.object;
       console.log(`PaymentIntent for ${paymentIntent.amount} was successful!`);
       console.log(`Payment intent customer ${paymentIntent.customer}`)
+      console.log()
       // Then define and call a method to handle the successful payment intent.
       // handlePaymentIntentSucceeded(paymentIntent);
 
@@ -81,17 +82,32 @@ app.post('/webhook', express.json({type: 'application/json'}), (request, respons
         // asynchronously called
       });
     break;
+    case 'payment_intent.created':
+      const paymentIntet = event.data.object;
+      console.log(paymentIntet)
+
+      break;
     case 'checkout.session.completed':
 
-      const setupIntentObj= event;
+      const setupIntentObj= event.data.object;
       if (setupIntentObj.setup_intent != null) {
         console.log(setupIntentObj)
-        const intent =  stripe.setupIntents.retrieve(setupIntentObj.setup_intent);
-        console.log(intent);
-        const paymentMethodStored =  stripe.paymentMethods.attach(
-          intent,
-          {customer: setupIntentObj.customer}
+       
+        const intent = await getIntent(setupIntentObj);
+        console.log(intent.payment_method);
+        const paymentMethodStored = await stripe.paymentMethods.attach(
+          intent.payment_method,
+          {customer: setupIntentObj.customer},
         );
+
+        console.log("finished");
+        console.log(paymentMethodStored);
+
+        const customer = await stripe.customers.update(
+          currentCustomer,
+          {invoice_settings: {default_source: paymentMethodStored.id}}
+        );
+
         response.redirect(`${YOUR_DOMAIN}/success-setup.html`)
   
       }
@@ -120,11 +136,14 @@ app.post('/orderBags', async (req, res) => {
     return;
   }
 
+  console.log('customer', customer);
+  console.log('currentCust', currentCustomer)
   if (customer != null && customer.default_source == null) {
     console.log("sent invoice");
+    console.log(customer);
     const invoiceItem = await stripe.invoiceItems.create({
       customer: currentCustomer,
-      price: 'price_1JhCJvC2zMcMmFPHHWdqZv9P',
+      price: 'price_1JiLN9JjeRN6yJjjDuDWRdK7',
     });
     const invoice = await stripe.invoices.create({
       customer: currentCustomer,
@@ -137,17 +156,30 @@ app.post('/orderBags', async (req, res) => {
     });
   }
   else {
-    console.log("sent invoice");
+    console.log("auto invoice");
+    console.log(currentCustomer);
     const invoiceItem = await stripe.invoiceItems.create({
       customer: currentCustomer,
-      price: 'price_1JhCJvC2zMcMmFPHHWdqZv9P',
+      price: 'price_1JiLN9JjeRN6yJjjDuDWRdK7',
     });
     const invoice = await stripe.invoices.create({
       customer: currentCustomer,
-      auto_advance: true // Auto-finalize this draft after ~1 hour
+      auto_advance: true, // Auto-finalize this draft after ~1 hour
+      default_source: customer.default_source
     });
+
+    console.log(invoice);
+
   }
+
   res.redirect(`${YOUR_DOMAIN}/success.html`)
 });
+
+var getIntent = async function(setupIntentObj, paymentMethod) {
+  const test = await stripe.setupIntents.retrieve(setupIntentObj.setup_intent)
+  console.log(test);
+  return test;
+  //return google.login(data.username, data.password).then(token => { return token } )
+}
 
 app.listen(4242, () => console.log('Running on port 4242'));
